@@ -38,14 +38,6 @@ public class Cat : MonoBehaviour
     private readonly Dictionary<TileBase, TileBase> shadowTileLookup =
         new Dictionary<TileBase, TileBase>();
 
-    // The light is at the top-right, therefore a raised cat cell casts onto
-    // the neighbouring visual cells on its left and bottom edges.
-    private static readonly Vector3Int[] ShadowCastDirections =
-    {
-        Vector3Int.left,
-        Vector3Int.down
-    };
-
     private GameManager gameManager;
     private Tilemap mapVisual;
     private Transform bodyRoot;
@@ -74,7 +66,7 @@ public class Cat : MonoBehaviour
         headRenderer = GetComponent<SpriteRenderer>();
         BuildShadowTileLookup();
         CreateBodyRoot();
-        ApplyVisualShadowsAround(startPosition);
+        ApplyVisualShadow(startPosition);
         initialized = true;
     }
 
@@ -169,7 +161,7 @@ public class Cat : MonoBehaviour
             transform.position = targetPosition;
             currentCell = nextCell;
             incomingDirection = moveDirection;
-            ApplyVisualShadowsAround(targetPosition);
+            ApplyVisualShadow(targetPosition);
         }
 
         isMoving = false;
@@ -194,22 +186,14 @@ public class Cat : MonoBehaviour
         }
     }
 
-    private void ApplyVisualShadowsAround(Vector3 worldPosition)
+    private void ApplyVisualShadow(Vector3 worldPosition)
     {
         if (mapVisual == null)
         {
             return;
         }
 
-        Vector3Int catVisualCell = mapVisual.WorldToCell(worldPosition);
-        foreach (Vector3Int castDirection in ShadowCastDirections)
-        {
-            ApplyVisualShadow(catVisualCell + castDirection);
-        }
-    }
-
-    private void ApplyVisualShadow(Vector3Int visualCell)
-    {
+        Vector3Int visualCell = mapVisual.WorldToCell(worldPosition);
         TileBase currentTile = mapVisual.GetTile(visualCell);
         if (currentTile == null)
         {
